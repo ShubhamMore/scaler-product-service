@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,39 +27,41 @@ public class StoreProductService implements ProductService {
     public Product getSingleProduct(Long id) {
         try {
             StoreProductDTO response = restTemplate.getForObject(
-                    "https://fakestoreapi.com/products/"+id,
+                    "https://fakestoreapi.com/products/" + id,
                     StoreProductDTO.class);
 
             return convertFakeStoreToProduct(response);
-        } catch (Exception e) {
+        }catch (Exception e){
             log.error("Some Exception occurred",e);
             return null;
         }
-
     }
 
     @Override
     public StoreProductDTO addNewProduct(StoreProductDTO product) {
         try {
-            StoreProductDTO response = restTemplate.postForObject("https://fakestoreapi.com/products",product,StoreProductDTO.class);
+            StoreProductDTO response = restTemplate.postForObject("https://fakestoreapi.com/products", product, StoreProductDTO.class);
             return response;
-        } catch (Exception e) {
+        }catch (Exception e){
             log.error("Some Exception occurred",e);
             return null;
         }
-
     }
 
     @Override
     public List<Product> getAllProducts() {
-//        try {
-//        Todo Need add Product [].Class instead List.Class
-            List<Product> productList = restTemplate.getForObject("https://fakestoreapi.com/products", List.class);
-            return productList;
-//        } catch (Exception e){
-//            log.error("Some Exception occurred",e);
-//            return null;
-//        }
+        StoreProductDTO[] response = restTemplate.getForObject(
+                "https://fakestoreapi.com/products",
+                StoreProductDTO[].class
+        );
+
+        List<Product> answer = new ArrayList<>();
+
+        for (StoreProductDTO dto: response) {
+            answer.add(convertFakeStoreToProduct(dto));
+        }
+
+        return answer;
     }
 
     private Product convertFakeStoreToProduct(StoreProductDTO StoreProductDTO ) {
