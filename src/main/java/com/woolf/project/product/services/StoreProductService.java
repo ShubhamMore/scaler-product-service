@@ -1,6 +1,7 @@
 package com.woolf.project.product.services;
 
 import com.woolf.project.product.dtos.StoreProductDTO;
+import com.woolf.project.product.exceptions.ProductNotExistException;
 import com.woolf.project.product.models.Category;
 import com.woolf.project.product.models.Product;
 import lombok.extern.log4j.Log4j2;
@@ -24,13 +25,19 @@ public class StoreProductService implements ProductService {
 
     //ToDo : Need to implement all other 7 APIs of fake store    16 oct, 23 oct, 25 oct
     @Override
-    public Product getSingleProduct(Long id) {
+    public Product getSingleProduct(Long id) throws ProductNotExistException {
         try {
-            StoreProductDTO response = restTemplate.getForObject(
+            StoreProductDTO productDTO = restTemplate.getForObject(
                     "https://fakestoreapi.com/products/" + id,
                     StoreProductDTO.class);
 
-            return convertFakeStoreToProduct(response);
+            if (productDTO == null) {
+                throw new ProductNotExistException(
+                        "Product doesn't exist."
+                );
+            }
+            
+            return convertStoreToProduct(productDTO);
         }catch (Exception e){
             log.error("Some Exception occurred",e);
             return null;
@@ -58,13 +65,13 @@ public class StoreProductService implements ProductService {
         List<Product> answer = new ArrayList<>();
 
         for (StoreProductDTO dto: response) {
-            answer.add(convertFakeStoreToProduct(dto));
+            answer.add(convertStoreToProduct(dto));
         }
 
         return answer;
     }
 
-    private Product convertFakeStoreToProduct(StoreProductDTO StoreProductDTO ) {
+    private Product convertStoreToProduct(StoreProductDTO StoreProductDTO ) {
         Product product = new Product();
         product.setId(StoreProductDTO.getId());
         product.setTitle(StoreProductDTO.getTitle());

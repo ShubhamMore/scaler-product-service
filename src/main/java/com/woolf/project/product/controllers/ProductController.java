@@ -1,6 +1,7 @@
 package com.woolf.project.product.controllers;
 
 import com.woolf.project.product.dtos.StoreProductDTO;
+import com.woolf.project.product.exceptions.ProductNotExistException;
 import com.woolf.project.product.models.Product;
 import com.woolf.project.product.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +27,11 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public Product getSingleProduct(@PathVariable("id") long id){
-
-        return productService.getSingleProduct(id);
+    public ResponseEntity<Product> getSingleProduct(@PathVariable("id") long id) throws ProductNotExistException {
+        return new ResponseEntity<>(
+                productService.getSingleProduct(id),
+                HttpStatus.OK
+        );
     }
 
     @PostMapping("/add")
@@ -48,4 +51,10 @@ public class ProductController {
         // put is used replace whole existing data with new data
         return new Product();
     }
+
+//    @ExceptionHandler(ProductNotExistException.class)
+//    public ResponseEntity<Void> handleProductNotExistException() {
+//        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//    }
+
 }
