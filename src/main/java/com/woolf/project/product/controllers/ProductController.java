@@ -5,6 +5,7 @@ import com.woolf.project.product.exceptions.ProductNotExistException;
 import com.woolf.project.product.models.Product;
 import com.woolf.project.product.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +15,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/products")
 public class ProductController {
+
     private ProductService productService;
+
     @Autowired
-    public ProductController(ProductService productService){
+    public ProductController(@Qualifier("selfProductService") ProductService productService){
         this.productService = productService;
     }
 
@@ -34,9 +37,8 @@ public class ProductController {
         );
     }
 
-    @PostMapping("/add")
-    public StoreProductDTO addNewProduct(@RequestBody StoreProductDTO product){
-
+    @PostMapping()
+    public Product addNewProduct(@RequestBody Product product){
         return productService.addNewProduct(product);
     }
 

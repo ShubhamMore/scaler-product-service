@@ -6,13 +6,16 @@ import com.woolf.project.product.models.Category;
 import com.woolf.project.product.models.Product;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpMessageConverterExtractor;
+import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Service("fakeStoreProductService")
 @Log4j2
 public class StoreProductService implements ProductService {
 
@@ -26,33 +29,19 @@ public class StoreProductService implements ProductService {
     //ToDo : Need to implement all other 7 APIs of fake store    16 oct, 23 oct, 25 oct
     @Override
     public Product getSingleProduct(Long id) throws ProductNotExistException {
-        try {
-            StoreProductDTO productDTO = restTemplate.getForObject(
-                    "https://fakestoreapi.com/products/" + id,
-                    StoreProductDTO.class);
 
-            if (productDTO == null) {
-                throw new ProductNotExistException(
-                        "Product doesn't exist."
-                );
-            }
-            
-            return convertStoreToProduct(productDTO);
-        }catch (Exception e){
-            log.error("Some Exception occurred",e);
-            return null;
-        }
-    }
+        StoreProductDTO productDto = restTemplate.getForObject(
+                "https://fakestoreapi.com/products/" + id,
+                StoreProductDTO.class);
 
-    @Override
-    public StoreProductDTO addNewProduct(StoreProductDTO product) {
-        try {
-            StoreProductDTO response = restTemplate.postForObject("https://fakestoreapi.com/products", product, StoreProductDTO.class);
-            return response;
-        }catch (Exception e){
-            log.error("Some Exception occurred",e);
-            return null;
+        if (productDto == null) {
+            throw new ProductNotExistException(
+                    "Product with id: " + id + " doesn't exist."
+            );
         }
+
+        return convertFakeStoreToProduct(productDto);
+
     }
 
     @Override
@@ -62,16 +51,49 @@ public class StoreProductService implements ProductService {
                 StoreProductDTO[].class
         );
 
+
         List<Product> answer = new ArrayList<>();
 
+
         for (StoreProductDTO dto: response) {
-            answer.add(convertStoreToProduct(dto));
+            answer.add(convertFakeStoreToProduct(dto));
         }
 
         return answer;
     }
 
-    private Product convertStoreToProduct(StoreProductDTO StoreProductDTO ) {
+    @Override
+    public Product updateProduct(Long id, Product product) {
+        return null;
+    }
+
+    @Override
+    public Product replaceProduct(Long id, Product product) {
+        StoreProductDTO storeProductDTO = new StoreProductDTO();
+        storeProductDTO.setTitle(product.getTitle());
+        storeProductDTO.setPrice(product.getPrice());
+        storeProductDTO.setImage(product.getDescription());
+        storeProductDTO.setImage(product.getImageUrl());
+
+        RequestCallback requestCallback = restTemplate.httpEntityCallback(storeProductDTO, StoreProductDTO.class);
+        HttpMessageConverterExtractor<StoreProductDTO> responseExtractor =
+                new HttpMessageConverterExtractor<>(StoreProductDTO.class, restTemplate.getMessageConverters());
+        StoreProductDTO response = restTemplate.execute("https://fakestoreapi.com/products/" + id, HttpMethod.PUT, requestCallback, responseExtractor);
+
+        return convertFakeStoreToProduct(response);
+    }
+
+    @Override
+    public Product addNewProduct(Product product) {
+        return null;
+    }
+
+    @Override
+    public boolean deleteProduct(Long id) {
+        return false;
+    }
+
+    private Product convertFakeStoreToProduct(StoreProductDTO StoreProductDTO ) {
         Product product = new Product();
         product.setId(StoreProductDTO.getId());
         product.setTitle(StoreProductDTO.getTitle());
@@ -82,4 +104,5 @@ public class StoreProductService implements ProductService {
         product.setImageUrl(StoreProductDTO.getImage());
         return product;
     }
+
 }
