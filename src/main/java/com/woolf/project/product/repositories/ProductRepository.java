@@ -2,7 +2,10 @@ package com.woolf.project.product.repositories;
 
 import com.woolf.project.product.models.Category;
 import com.woolf.project.product.models.Product;
+import com.woolf.project.product.repositories.projections.ProductWithIdAndTitle;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -30,5 +33,9 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 
     Product save(Product product);
 
-}
+    @Query("select p.id as id, p.title as title from Product p where p.id = :id")
+    List<ProductWithIdAndTitle> somethingsomething(@Param("id") Long id);
 
+    @Query(value = "select p.id as id, p.title as title from product p where p.id = :id", nativeQuery = true)
+    List<ProductWithIdAndTitle> somesome2(@Param("id") Long id);
+}

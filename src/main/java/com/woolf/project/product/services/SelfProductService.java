@@ -6,11 +6,13 @@ import com.woolf.project.product.models.Product;
 import com.woolf.project.product.repositories.CategoryRepository;
 import com.woolf.project.product.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Primary
 @Service("selfProductService")
 public class SelfProductService implements ProductService {
     private final ProductRepository productRepository;
@@ -26,7 +28,7 @@ public class SelfProductService implements ProductService {
     @Override
     public Product getSingleProduct(Long id) throws ProductNotExistException { // In Class
 
-        Optional<Product> productOptional = productRepository.findById(1L);
+        Optional<Product> productOptional = productRepository.findById(id);
 
         if (productOptional.isEmpty()) {
             throw new ProductNotExistException("Product with id: " + id + " doesn't exist.");
@@ -58,7 +60,7 @@ public class SelfProductService implements ProductService {
         Optional<Category> categoryOptional = categoryRepository.findByName(product.getCategory().getName());
 
         if (categoryOptional.isEmpty()) {
-            product.setCategory(categoryRepository.save(product.getCategory()));
+
         } else {
             product.setCategory(categoryOptional.get());
         }
