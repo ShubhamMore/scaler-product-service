@@ -1,6 +1,7 @@
 package com.woolf.project.product.advices;
 
 import com.woolf.project.product.dto.ExceptionDTO;
+import com.woolf.project.product.exceptions.InsufficientStockException;
 import com.woolf.project.product.exceptions.InvalidDataException;
 import com.woolf.project.product.exceptions.ProductNotExistException;
 import org.springframework.http.HttpStatus;
@@ -29,4 +30,11 @@ public class ControllerAdvices {
         ExceptionDTO exceptionDto = new ExceptionDTO(HttpStatus.BAD_REQUEST, ex.getMessage());
         return new ResponseEntity<>(exceptionDto, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(InsufficientStockException.class)
+    ResponseEntity<ExceptionDTO> handleInsufficientException(InsufficientStockException ex){
+        ExceptionDTO exceptionDto = new ExceptionDTO(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return new ResponseEntity<>(exceptionDto, HttpStatus.BAD_REQUEST);
+    }
+
 }
