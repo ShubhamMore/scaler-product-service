@@ -2,6 +2,7 @@ package com.woolf.project.product.controllers;
 
 import com.woolf.project.product.dto.CreateProductDTO;
 import com.woolf.project.product.dto.ProductDTO;
+import com.woolf.project.product.exceptions.CategoryNotExistException;
 import com.woolf.project.product.exceptions.InvalidDataException;
 import com.woolf.project.product.exceptions.ProductNotExistException;
 import com.woolf.project.product.exceptions.ResourceAccessForbiddenException;
@@ -33,10 +34,10 @@ public class ProductController {
         this.userRepository = userRepository;
     }
 
-    @PostMapping("/product")
+    @PostMapping("/create-product")
     public ResponseEntity<ProductDTO> createProduct(Authentication authentication,
                                                     @Valid @RequestBody CreateProductDTO createProductDTO)
-            throws InvalidDataException, ResourceAccessForbiddenException {
+            throws InvalidDataException, ResourceAccessForbiddenException,CategoryNotExistException {
 
         Jwt jwt = ((JwtAuthenticationToken) authentication).getToken();
         User user = UserUtils.createUserIfNotExist(jwt, userRepository);
@@ -67,9 +68,9 @@ public class ProductController {
         return new ResponseEntity<>(productDtoList, HttpStatus.OK);
     }
 
-    @PatchMapping("/product/{id}")
+    @PatchMapping("/update-product/{id}")
     public ResponseEntity<ProductDTO> updateProduct(Authentication authentication, @PathVariable long id,
-                                                    @RequestBody Map<String, Object> updates) throws ResourceAccessForbiddenException, ProductNotExistException {
+                                                    @RequestBody Map<String, Object> updates) throws ResourceAccessForbiddenException, ProductNotExistException, CategoryNotExistException {
         Jwt jwt = ((JwtAuthenticationToken) authentication).getToken();
         User user = UserUtils.createUserIfNotExist(jwt, userRepository);
 
