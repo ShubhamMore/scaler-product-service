@@ -3,7 +3,6 @@ package com.woolf.project.product.controllers;
 import com.woolf.project.product.dto.CreateProductDTO;
 import com.woolf.project.product.dto.ProductDTO;
 import com.woolf.project.product.exceptions.InvalidDataException;
-import com.woolf.project.product.exceptions.NotFoundException;
 import com.woolf.project.product.exceptions.ProductNotExistException;
 import com.woolf.project.product.exceptions.ResourceAccessForbiddenException;
 import com.woolf.project.product.models.User;
@@ -11,8 +10,7 @@ import com.woolf.project.product.models.product.Product;
 import com.woolf.project.product.repositories.UserRepository;
 import com.woolf.project.product.services.ProductService;
 import com.woolf.project.product.utils.UserUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -25,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/products")
+@RequestMapping("products")
 public class ProductController {
 
     private ProductService productService;
@@ -36,17 +34,17 @@ public class ProductController {
     }
 
     @PostMapping("/product")
-    public ResponseEntity<ProductDTO> crateProduct(Authentication authentication,
-                                                   @RequestBody CreateProductDTO createProductDto)
+    public ResponseEntity<ProductDTO> createProduct(Authentication authentication,
+                                                    @Valid @RequestBody CreateProductDTO createProductDTO)
             throws InvalidDataException, ResourceAccessForbiddenException {
 
         Jwt jwt = ((JwtAuthenticationToken) authentication).getToken();
         User user = UserUtils.createUserIfNotExist(jwt, userRepository);
 
         if(!(user.getRoles().contains("ADMIN")) && (!user.getRoles().contains("SUPER_ADMIN")) ) {
-            throw new ResourceAccessForbiddenException("Not Allowed to create product");
+            throw new ResourceAccessForbiddenException("No Access to create product");
         }
-        Product product = productService.createProduct(createProductDto);
+        Product product = productService.createProduct(createProductDTO);
         return new ResponseEntity<>(ProductDTO.fromProduct(product), HttpStatus.CREATED);
     }
 
@@ -76,7 +74,7 @@ public class ProductController {
         User user = UserUtils.createUserIfNotExist(jwt, userRepository);
 
         if(!(user.getRoles().contains("ADMIN")) && (!user.getRoles().contains("SUPER_ADMIN")) ) {
-            throw new ResourceAccessForbiddenException("Not Allowed to Update product");
+            throw new ResourceAccessForbiddenException("Not Access to Update product");
         }
         Product product = productService.updateProduct(id, updates);
         return new ResponseEntity<>(ProductDTO.fromProduct(product), HttpStatus.OK);
