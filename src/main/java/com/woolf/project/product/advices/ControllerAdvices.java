@@ -1,10 +1,7 @@
 package com.woolf.project.product.advices;
 
 import com.woolf.project.product.dto.ExceptionDTO;
-import com.woolf.project.product.exceptions.InsufficientStockException;
-import com.woolf.project.product.exceptions.InvalidDataException;
-import com.woolf.project.product.exceptions.ProductNotExistException;
-import com.woolf.project.product.exceptions.ResourceAccessForbiddenException;
+import com.woolf.project.product.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -44,4 +41,9 @@ public class ControllerAdvices {
         return new ResponseEntity<>(exceptionDto, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(PaymentClientException.class)
+    ResponseEntity<ExceptionDTO> handlePaymentClientException(PaymentClientException ex){
+        ExceptionDTO exceptionDto = new ExceptionDTO(HttpStatus.BAD_REQUEST, ex.getMessage());
+        return new ResponseEntity<>(exceptionDto, HttpStatus.BAD_REQUEST);
+    }
 }
