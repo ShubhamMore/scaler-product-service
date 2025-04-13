@@ -1,6 +1,5 @@
 package com.woolf.project.product.models;
 
-import com.woolf.project.product.enums.Roles;
 import com.woolf.project.product.models.cart.Cart;
 import jakarta.persistence.*;
 import lombok.Getter;

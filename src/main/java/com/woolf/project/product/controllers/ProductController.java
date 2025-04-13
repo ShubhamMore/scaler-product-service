@@ -33,7 +33,7 @@ public class ProductController {
         this.userRepository = userRepository;
     }
 
-    @PostMapping("/create-product")
+    @PostMapping("/createProduct")
     public ResponseEntity<ProductDTO> createProduct(Authentication authentication,
                                                     @Valid @RequestBody ProductDTO productDTO)
             throws InvalidDataException, ResourceAccessForbiddenException,CategoryNotExistException {
@@ -68,7 +68,7 @@ public class ProductController {
         return new ResponseEntity<>(productDtoList, HttpStatus.OK);
     }
 
-    @PatchMapping("/update-product/{id}")
+    @PatchMapping("/updateProduct/{id}")
     public ResponseEntity<ProductDTO> updateProduct(Authentication authentication, @PathVariable long id,
                                                     @RequestBody ProductDTO productDTO) throws ResourceAccessForbiddenException, ProductNotExistException, CategoryNotExistException {
         Jwt jwt = ((JwtAuthenticationToken) authentication).getToken();

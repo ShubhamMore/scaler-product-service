@@ -41,7 +41,7 @@ public class OrderController {
         return new ResponseEntity<>(OrderDTO.fromOrder(order), HttpStatus.CREATED);
     }
 
-    @PostMapping("/confirm-payment/{paymentOrderId}")
+    @PostMapping("/confirmPayment/{paymentOrderId}")
     public ResponseEntity<OrderDTO> confirmPayment(Authentication authentication, @PathVariable String paymentOrderId)
             throws NotFoundException, PaymentClientException {
         Jwt jwt = ((JwtAuthenticationToken) authentication).getToken();

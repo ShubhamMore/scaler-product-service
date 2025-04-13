@@ -61,8 +61,8 @@ public class CategoryController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CategoryDTO> updateCategory(Authentication authentication,
-                                                      @PathVariable Long id,
-                                                      @RequestBody CategoryDTO categoryDTO) throws ResourceAccessForbiddenException {
+            @PathVariable Long id,
+            @RequestBody CategoryDTO categoryDTO) throws ResourceAccessForbiddenException {
 
         Jwt jwt = ((JwtAuthenticationToken) authentication).getToken();
         User user = UserUtils.createUserIfNotExist(jwt, userRepository);
